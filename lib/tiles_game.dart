@@ -11,17 +11,14 @@ import 'package:flame/sprite.dart';
 import 'package:flame_tiles/tile_objects/river.dart';
 
 class TilesGame extends FlameGame
-    with
-        MouseMovementDetector,
-        TapDetector,
-        PanDetector,
-        ScrollDetector,
-        ScaleDetector {
+    with MouseMovementDetector, TapDetector, ScrollDetector, ScaleDetector {
   late final IsometricTileMapComponent map;
   late final Selector selector;
 
   late final Ember ember;
   Block emberPosition = Block(0, 0);
+
+  double? _startZoom;
 
   @override
   FutureOr<void> onLoad() async {
@@ -94,26 +91,6 @@ class TilesGame extends FlameGame
   }
 
   @override
-  void onPanStart(DragStartInfo info) {
-    selector.show = false;
-  }
-
-  @override
-  void onPanUpdate(DragUpdateInfo info) {
-    camera.moveBy(-info.delta.global / camera.viewfinder.zoom);
-  }
-
-  @override
-  void onPanEnd(DragEndInfo info) {
-    selector.show = true;
-  }
-
-  @override
-  void onPanCancel() {
-    selector.show = true;
-  }
-
-  @override
   void onScroll(PointerScrollInfo info) {
     final d = info.scrollDelta.global.y;
     if (d > 0) {
@@ -124,9 +101,28 @@ class TilesGame extends FlameGame
   }
 
   @override
+  void onScaleStart(ScaleStartInfo info) {
+    _startZoom = camera.viewfinder.zoom;
+    selector.show = false;
+  }
+
+  @override
   void onScaleUpdate(ScaleUpdateInfo info) {
-    camera.viewfinder.zoom += (camera.viewfinder.zoom - info.delta.global.x)
-        .clamp(0.5, 2);
+    if (!info.scale.global.isIdentity()) {
+      if (_startZoom == null) return;
+      camera.viewfinder.zoom = (_startZoom! * info.scale.global.y).clamp(
+        0.5,
+        2,
+      );
+    } else {
+      camera.moveBy(-info.delta.global / camera.viewfinder.zoom);
+    }
+  }
+
+  @override
+  void onScaleEnd(ScaleEndInfo info) {
+    _startZoom = null;
+    selector.show = true;
   }
 }
 
