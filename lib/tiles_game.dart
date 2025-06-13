@@ -11,7 +11,12 @@ import 'package:flame/sprite.dart';
 import 'package:flame_tiles/tile_objects/river.dart';
 
 class TilesGame extends FlameGame
-    with MouseMovementDetector, TapDetector, PanDetector, ScrollDetector {
+    with
+        MouseMovementDetector,
+        TapDetector,
+        PanDetector,
+        ScrollDetector,
+        ScaleDetector {
   late final IsometricTileMapComponent map;
   late final Selector selector;
 
@@ -117,6 +122,12 @@ class TilesGame extends FlameGame
       camera.viewfinder.zoom = math.min(2, camera.viewfinder.zoom + 0.1);
     }
   }
+
+  @override
+  void onScaleUpdate(ScaleUpdateInfo info) {
+    camera.viewfinder.zoom += (camera.viewfinder.zoom - info.delta.global.x)
+        .clamp(0.5, 2);
+  }
 }
 
 class Selector extends SpriteComponent {
@@ -166,6 +177,8 @@ class Ember<T extends TilesGame> extends SpriteAnimationComponent
   bool get movingInProgress => children.any((c) => c is SequenceEffect);
 
   void moveTo(Block block, {void Function()? onComplete}) {
+    if (block == mapPosition) return;
+
     if (block.x != mapPosition.x && block.y != mapPosition.y) {
       moveTo(Block(block.x, mapPosition.y), onComplete: () => moveTo(block));
       return;
