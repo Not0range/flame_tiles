@@ -1,46 +1,48 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
-import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
-import 'package:flame_tiles/tile_objects/river.dart';
+import 'package:flutter/services.dart';
+
+import 'components/map_selector.dart';
+import 'utils/matrix_utils.dart';
 
 class TilesGame extends FlameGame
     with MouseMovementDetector, TapDetector, ScrollDetector, ScaleDetector {
   late final IsometricTileMapComponent map;
-  late final Selector selector;
-
+  late final MapSelector selector;
   late final Ember ember;
-  Block emberPosition = Block(0, 0);
+
+  final List<Block> _path = List.empty(growable: true);
+  var _current = 0;
 
   double? _startZoom;
 
   @override
   FutureOr<void> onLoad() async {
+    final mapJson = jsonDecode(
+      await rootBundle.loadString('assets/maps/map.json'),
+    );
+
+    final matrix = MatrixUtils.create2DMatrix(
+      mapJson['sizes']['height'],
+      mapJson['sizes']['width'],
+    );
+
+    final tiles = mapJson['tiles'] as List<dynamic>;
+    for (var tile in tiles) {
+      _path.add(Block(tile['x'], tile['y']));
+      matrix[tile['y']][tile['x']] = 0;
+    }
+
     final tilesImg = await images.load('tiles.png');
     final sprites = SpriteSheet(image: tilesImg, srcSize: Vector2.all(32));
-    // final matrix = MatrixUtils.generate2DMatrix(
-    //   50,
-    //   50,
-    //   (_, __) => _rand.nextInt(5) - 1,
-    // ); // MatrixUtils.create2DMatrix(50, 50, initialValue: 0);
-    final matrix = [
-      [3, 0, 0, 0, 3, -1, 0, 0, 0, 0],
-      [-1, -1, -1, -1, 0, -1, 0, -1, -1, 0],
-      [-1, -1, -1, -1, 0, -1, 0, -1, 0, 0],
-      [0, 0, 0, 0, 0, -1, 0, -1, 0, -1],
-      [0, -1, -1, -1, 3, -1, 0, -1, 0, 0],
-      [0, -1, 0, 0, 0, 0, 0, -1, -1, 0],
-      [0, -1, 0, -1, -1, -1, -1, -1, -1, 0],
-      [0, -1, 0, -1, 0, 0, 0, 0, 0, 0],
-      [0, -1, 0, -1, 0, -1, -1, -1, -1, -1],
-      [0, 0, 0, -1, 0, 0, 0, 0, 0, 0],
-    ];
 
     world.add(
       map = IsometricTileMapComponent(
@@ -52,19 +54,8 @@ class TilesGame extends FlameGame
     );
 
     final selectorImage = await images.load('selector.png');
-    world.add(selector = Selector(64, selectorImage));
-    world.add(ember = Ember<TilesGame>(mapPosition: Block(0, 0)));
-
-    world.add(
-      Ember<TilesGame>(mapPosition: Block(1, 1), size: Vector2.all(64)),
-    );
-
-    world.add(River<TilesGame>(mapPosition: Block(1, 0), type: 1, size: 64));
-    world.add(River<TilesGame>(mapPosition: Block(2, 0), type: 1, size: 64));
-    world.add(River<TilesGame>(mapPosition: Block(3, 0), type: 1, size: 64));
-    world.add(River<TilesGame>(mapPosition: Block(4, 1), type: 0, size: 64));
-    world.add(River<TilesGame>(mapPosition: Block(4, 2), type: 0, size: 64));
-    world.add(River<TilesGame>(mapPosition: Block(4, 3), type: 0, size: 64));
+    world.add(selector = MapSelector(64, selectorImage));
+    world.add(ember = Ember<TilesGame>(mapPosition: _path[0]));
   }
 
   @override
@@ -74,7 +65,7 @@ class TilesGame extends FlameGame
             camera.viewfinder.zoom +
         camera.viewfinder.position;
     final block = map.getBlock(screenPosition);
-    selector.show = map.containsBlock(block);
+    selector.show = map.containsBlock(block) && map.blockValue(block) != -1;
     selector.position.setFrom(map.position + map.getBlockRenderPosition(block));
   }
 
@@ -85,9 +76,9 @@ class TilesGame extends FlameGame
             camera.viewfinder.zoom +
         camera.viewfinder.position;
     final block = map.getBlock(screenPosition);
-    if (!map.containsBlock(block) || ember.movingInProgress) return;
+    if (!map.containsBlock(block)) return;
 
-    ember.moveTo(block);
+    // ember.moveTo(block);
   }
 
   @override
@@ -102,6 +93,7 @@ class TilesGame extends FlameGame
 
   @override
   void onScaleStart(ScaleStartInfo info) {
+    overlays.remove('GameOverlay');
     _startZoom = camera.viewfinder.zoom;
     selector.show = false;
   }
@@ -121,27 +113,21 @@ class TilesGame extends FlameGame
 
   @override
   void onScaleEnd(ScaleEndInfo info) {
+    overlays.add('GameOverlay');
     _startZoom = null;
-    selector.show = true;
   }
-}
 
-class Selector extends SpriteComponent {
-  bool show = true;
-
-  Selector(double s, Image image)
-    : super(
-        sprite: Sprite(image, srcSize: Vector2.all(32.0)),
-        size: Vector2.all(s),
-      );
-
-  @override
-  void render(Canvas canvas) {
-    if (!show) {
-      return;
-    }
-
-    super.render(canvas);
+  void dice() {
+    overlays.remove('GameOverlay');
+    final result = math.Random().nextInt(6) + 1;
+    final path = _path.skip(_current).take(result).toList(growable: false);
+    ember.movePath(
+      path,
+      onComplete: () {
+        overlays.add('GameOverlay');
+        _current += result;
+      },
+    );
   }
 }
 
@@ -171,6 +157,45 @@ class Ember<T extends TilesGame> extends SpriteAnimationComponent
   }
 
   bool get movingInProgress => children.any((c) => c is SequenceEffect);
+
+  void movePath(List<Block> path, {void Function()? onComplete}) {
+    if (path.isEmpty) return;
+
+    final effects = List<Effect>.empty(growable: true);
+    // final scopePosition = mapPosition;
+    for (var i = 0; i < path.length - 1; i++) {
+      final dest = map.getBlockCenterPosition(path[i]);
+      effects.add(
+        MoveEffect.to(
+          dest,
+          EffectController(speed: 100),
+          onComplete: () {
+            mapPosition = path[i];
+          },
+        ),
+      );
+    }
+    effects.add(
+      MoveEffect.to(
+        map.getBlockCenterPosition(path[path.length - 1]),
+        EffectController(speed: 100),
+        onComplete: () {
+          mapPosition = path[path.length - 1];
+        },
+      ),
+    );
+
+    animation?.stepTime = 0.1;
+    add(
+      SequenceEffect(
+        effects,
+        onComplete: () {
+          animation?.stepTime = 0.15;
+          onComplete?.call();
+        },
+      ),
+    );
+  }
 
   void moveTo(Block block, {void Function()? onComplete}) {
     if (block == mapPosition) return;
