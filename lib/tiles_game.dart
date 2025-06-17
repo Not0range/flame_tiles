@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
+import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
@@ -62,6 +63,7 @@ class TilesGame extends FlameGame
 
   @override
   void onMouseMove(PointerHoverInfo info) {
+    if (info.raw.kind != PointerDeviceKind.mouse) return;
     final screenPosition =
         (info.eventPosition.widget - camera.viewport.size / 2) /
             camera.viewfinder.zoom +
