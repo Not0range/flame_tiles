@@ -78,7 +78,7 @@ Widget _gameOverlay(BuildContext context, TilesGame game) {
               iconSize: 40,
               color: Colors.white,
               icon: Badge(
-                label: Text('${state.dices}'),
+                label: Text('${state.currency}'),
                 alignment: Alignment.bottomLeft,
                 child: Icon(Icons.diamond),
               ),
