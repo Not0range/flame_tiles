@@ -43,6 +43,8 @@ Widget inventoryOverlay(BuildContext context, TilesGame game) {
                   children: List.generate(
                     count,
                     (c) => _inventoryCell(
+                      ctx,
+                      game,
                       inventory.elementAtOrNull(r * count + c),
                     ),
                     growable: false,
@@ -57,7 +59,7 @@ Widget inventoryOverlay(BuildContext context, TilesGame game) {
   );
 }
 
-Widget _inventoryCell(int? child) {
+Widget _inventoryCell(BuildContext context, TilesGame game, int? child) {
   final icon = switch (child) {
     0 => Icons.ac_unit,
     1 => Icons.access_alarm,
@@ -68,13 +70,28 @@ Widget _inventoryCell(int? child) {
   return Expanded(
     child: AspectRatio(
       aspectRatio: 1,
-      child: Container(
-        margin: EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: Colors.black12,
-          borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: EdgeInsets.all(4),
+        child: Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: child != null
+                ? () {
+                    Provider.of<AppState>(context, listen: false).description =
+                        'Item type $child';
+                    game.overlays.add('Description', priority: 2);
+                  }
+                : null,
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.black12,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: (icon != null ? Icon(icon, size: 40) : null),
+            ),
+          ),
         ),
-        child: icon != null ? Icon(icon, size: 40) : null,
       ),
     ),
   );
