@@ -63,7 +63,7 @@ Widget _gameOverlay(BuildContext context, TilesGame game) {
               ),
             ),
             IconButton(
-              onPressed: () => game.overlays.toggle('Inventory'),
+              onPressed: () => game.overlays.toggle('Inventory', priority: 1),
               iconSize: 40,
               color: Colors.white,
               icon: Icon(Icons.backpack_outlined),
