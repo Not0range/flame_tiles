@@ -9,7 +9,9 @@ import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
+import 'app_state.dart';
 import 'components/map_selector.dart';
 import 'utils/matrix_utils.dart';
 
@@ -93,7 +95,7 @@ class TilesGame extends FlameGame
 
   @override
   void onScaleStart(ScaleStartInfo info) {
-    overlays.remove('GameOverlay');
+    overlays.remove('DiceButton');
     _startZoom = camera.viewfinder.zoom;
     selector.show = false;
   }
@@ -113,21 +115,32 @@ class TilesGame extends FlameGame
 
   @override
   void onScaleEnd(ScaleEndInfo info) {
-    overlays.add('GameOverlay');
+    if (!ember.movingInProgress) overlays.add('DiceButton');
     _startZoom = null;
   }
 
   void dice() {
-    overlays.remove('GameOverlay');
+    if (buildContext == null) return;
+
+    final provider = Provider.of<AppState>(buildContext!, listen: false);
+    if (provider.dices <= 0) {
+      return;
+    }
+
     final result = math.Random().nextInt(6) + 1;
-    final path = _path.skip(_current).take(result).toList(growable: false);
+    final path = _path.skip(_current + 1).take(result).toList(growable: false);
+
+    if (path.isEmpty) return;
+    provider.dices -= 1;
+    overlays.remove('DiceButton');
     ember.movePath(
       path,
       onComplete: () {
-        overlays.add('GameOverlay');
+        overlays.add('DiceButton');
         _current += result;
       },
     );
+    print(result);
   }
 }
 
