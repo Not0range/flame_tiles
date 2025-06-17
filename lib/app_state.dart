@@ -24,6 +24,20 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  String? _description;
+  String? get description => _description;
+  set description(String? value) {
+    _description = value;
+    notifyListeners();
+  }
+
+  int? _currentDice;
+  int? get currentDice => _currentDice;
+  set currentDice(int? value) {
+    _currentDice = value;
+    notifyListeners();
+  }
+
   void add(int value) {
     _inventory.add(value);
     notifyListeners();

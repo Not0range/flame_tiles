@@ -80,9 +80,12 @@ class TilesGame extends FlameGame
             camera.viewfinder.zoom +
         camera.viewfinder.position;
     final block = map.getBlock(screenPosition);
-    if (!map.containsBlock(block)) return;
+    if (!map.containsBlock(block) || buildContext == null) return;
 
-    // ember.moveTo(block);
+    selector.show = false;
+    final provider = Provider.of<AppState>(buildContext!, listen: false);
+    provider.description = 'Just empty tile. Really...';
+    overlays.add('Description', priority: 1);
   }
 
   @override
