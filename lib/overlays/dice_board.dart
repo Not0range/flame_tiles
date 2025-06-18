@@ -255,7 +255,8 @@ const _diceRotates = [
 
 final _sideDecoration = BoxDecoration(
   color: Colors.white,
-  border: Border.all(color: Colors.black),
+  border: Border.all(color: Colors.black, width: 1.5),
+  borderRadius: BorderRadius.circular(8),
 );
 const _sidePadding = EdgeInsets.all(8);
 final _sides = [
