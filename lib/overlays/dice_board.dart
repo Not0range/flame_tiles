@@ -25,24 +25,7 @@ class _DiceBoard extends StatefulWidget {
 
 const _diceSize = 100.0;
 
-final _speedDividers = [
-  // 1,
-  2,
-  3,
-  4,
-  5,
-  6,
-  8,
-  10,
-  12,
-  15,
-  18,
-  20,
-  24,
-  30,
-  36,
-  // 45,
-];
+final _speedDividers = [2, 3, 4, 5, 6, 8, 10, 12, 15, 18, 20, 24, 30];
 
 class _DiceBoardState extends State<_DiceBoard> {
   late Timer _timer;
