@@ -18,6 +18,8 @@ import 'utils/matrix_utils.dart';
 
 class TilesGame extends FlameGame
     with MouseMovementDetector, TapDetector, ScrollDetector, ScaleDetector {
+  final _rand = math.Random();
+
   late final IsometricTileMapComponent map;
   late final MapSelector selector;
   late final Ember ember;
@@ -86,7 +88,12 @@ class TilesGame extends FlameGame
 
     selector.show = false;
     final provider = Provider.of<AppState>(buildContext!, listen: false);
-    provider.description = 'Just empty tile. Really...';
+
+    provider.description = switch (_rand.nextInt(2)) {
+      0 => 'Just empty tile. Really...',
+      1 => 'Another empty tile. Really...',
+      _ => '???',
+    };
     overlays.add('Description', priority: 1);
   }
 
