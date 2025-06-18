@@ -38,7 +38,7 @@ Widget inventoryOverlay(BuildContext context, TilesGame game) {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: 10,
+                itemCount: (30 / count).ceil(),
                 itemBuilder: (ctx, r) => Row(
                   children: List.generate(
                     count,
