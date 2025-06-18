@@ -96,6 +96,7 @@ class TilesGame extends FlameGame
     } else if (d < 0) {
       camera.viewfinder.zoom = math.min(2, camera.viewfinder.zoom + 0.1);
     }
+    selector.show = false;
   }
 
   @override
