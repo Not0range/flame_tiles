@@ -128,16 +128,27 @@ class TilesGame extends FlameGame
     if (buildContext == null) return;
 
     final provider = Provider.of<AppState>(buildContext!, listen: false);
-    if (provider.dices <= 0) {
+    if (provider.dices <= 0 || _current == _path.length - 1) {
       return;
     }
 
-    final result = math.Random().nextInt(6) + 1;
-    final path = _path.skip(_current + 1).take(result).toList(growable: false);
+    final result = math.Random().nextInt(6);
 
-    if (path.isEmpty) return;
+    provider.currentDice = result;
     provider.dices -= 1;
     overlays.remove('DiceButton');
+    overlays.add('Diceboard');
+  }
+
+  void diceResult() {
+    if (buildContext == null) return;
+
+    overlays.remove('Diceboard');
+    final provider = Provider.of<AppState>(buildContext!, listen: false);
+    if (provider.currentDice == null) return;
+
+    final result = provider.currentDice! + 1;
+    final path = _path.skip(_current + 1).take(result).toList(growable: false);
     ember.movePath(
       path,
       onComplete: () {
@@ -145,7 +156,7 @@ class TilesGame extends FlameGame
         _current += result;
       },
     );
-    print(result);
+    provider.currentDice = null;
   }
 }
 
