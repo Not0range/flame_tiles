@@ -33,8 +33,14 @@ Widget gameOverlay(BuildContext context, TilesGame game) {
           ],
         ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            IconButton(
+              onPressed: () => game.resetCamera(),
+              iconSize: 40,
+              color: Colors.white,
+              icon: Icon(Icons.videocam_outlined),
+            ),
             IconButton(
               onPressed: () {},
               iconSize: 40,

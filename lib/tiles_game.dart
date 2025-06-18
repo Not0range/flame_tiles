@@ -59,6 +59,8 @@ class TilesGame extends FlameGame
     final selectorImage = await images.load('selector.png');
     world.add(selector = MapSelector(64, selectorImage));
     world.add(ember = Ember<TilesGame>(mapPosition: _path[0]));
+
+    camera.follow(ember);
   }
 
   @override
@@ -157,7 +159,12 @@ class TilesGame extends FlameGame
         _current += result;
       },
     );
+    camera.follow(ember);
     provider.currentDice = null;
+  }
+
+  void resetCamera() {
+    camera.follow(ember);
   }
 }
 
