@@ -14,12 +14,11 @@ import 'package:provider/provider.dart';
 import 'app_state.dart';
 import 'components/decoration_object.dart';
 import 'components/map_component.dart';
-import 'components/map_selector.dart';
 import 'utils/matrix_utils.dart';
 
-class TilesGame extends FlameGame with ScrollDetector, ScaleDetector {
+class TilesGame extends FlameGame
+    with ScrollDetector, ScaleDetector, MouseMovementDetector {
   late final IsometricTileMapComponent map;
-  late final MapSelector selector;
   late final Ember ember;
 
   final _path = <Block>[];
@@ -56,8 +55,6 @@ class TilesGame extends FlameGame with ScrollDetector, ScaleDetector {
       ),
     );
 
-    final selectorImage = await images.load('selector.png');
-    world.add(selector = MapSelector(64, selectorImage));
     world.add(ember = Ember<TilesGame>(mapPosition: _path[0]));
 
     final dec = await images.load('a.png');
@@ -74,6 +71,11 @@ class TilesGame extends FlameGame with ScrollDetector, ScaleDetector {
   }
 
   @override
+  void onMouseMove(PointerHoverInfo info) {
+    info.handled = false;
+  }
+
+  @override
   void onScroll(PointerScrollInfo info) {
     final d = info.scrollDelta.global.y;
     if (d > 0) {
@@ -81,14 +83,12 @@ class TilesGame extends FlameGame with ScrollDetector, ScaleDetector {
     } else if (d < 0) {
       camera.viewfinder.zoom = math.min(2, camera.viewfinder.zoom + 0.1);
     }
-    selector.show = false;
   }
 
   @override
   void onScaleStart(ScaleStartInfo info) {
     overlays.remove('DiceButton');
     _startZoom = camera.viewfinder.zoom;
-    selector.show = false;
   }
 
   @override
