@@ -8,6 +8,7 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
+import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
@@ -68,6 +69,11 @@ class TilesGame extends FlameGame
     );
 
     camera.follow(ember);
+  }
+
+  @override
+  Color backgroundColor() {
+    return Colors.blue;
   }
 
   @override
