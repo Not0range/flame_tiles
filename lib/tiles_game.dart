@@ -24,7 +24,7 @@ class TilesGame extends FlameGame
   late final MapSelector selector;
   late final Ember ember;
 
-  final List<Block> _path = List.empty(growable: true);
+  final _path = <Block>[];
   var _current = 0;
 
   double? _startZoom;
@@ -61,6 +61,17 @@ class TilesGame extends FlameGame
     final selectorImage = await images.load('selector.png');
     world.add(selector = MapSelector(64, selectorImage));
     world.add(ember = Ember<TilesGame>(mapPosition: _path[0]));
+
+    final dec = await images.load('a.png');
+    world.add(
+      (SpriteComponent.fromImage(
+        dec,
+        position: Vector2(2368 - 90, 2400 - 60),
+        anchor: Anchor.center,
+        scale: Vector2.all(0.3),
+        priority: 1000,
+      )),
+    );
 
     camera.follow(ember);
   }
@@ -205,8 +216,7 @@ class Ember<T extends TilesGame> extends SpriteAnimationComponent
   void movePath(List<Block> path, {void Function()? onComplete}) {
     if (path.isEmpty) return;
 
-    final effects = List<Effect>.empty(growable: true);
-    // final scopePosition = mapPosition;
+    final effects = <Effect>[];
     for (var i = 0; i < path.length - 1; i++) {
       final dest = map.getBlockCenterPosition(path[i]);
       effects.add(
