@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
-import 'dart:ui';
 
 import 'package:flame/components.dart';
 import 'package:flame/effects.dart';
@@ -13,13 +12,12 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'app_state.dart';
+import 'components/decoration_object.dart';
+import 'components/map_component.dart';
 import 'components/map_selector.dart';
 import 'utils/matrix_utils.dart';
 
-class TilesGame extends FlameGame
-    with MouseMovementDetector, TapDetector, ScrollDetector, ScaleDetector {
-  final _rand = math.Random();
-
+class TilesGame extends FlameGame with ScrollDetector, ScaleDetector {
   late final IsometricTileMapComponent map;
   late final MapSelector selector;
   late final Ember ember;
@@ -50,7 +48,7 @@ class TilesGame extends FlameGame
     final sprites = SpriteSheet(image: tilesImg, srcSize: Vector2.all(32));
 
     world.add(
-      map = IsometricTileMapComponent(
+      map = MapComponent(
         sprites,
         matrix,
         destTileSize: Vector2.all(64),
@@ -64,48 +62,15 @@ class TilesGame extends FlameGame
 
     final dec = await images.load('a.png');
     world.add(
-      (SpriteComponent.fromImage(
+      DecorationObject(
         dec,
-        position: Vector2(2368 - 90, 2400 - 60),
-        anchor: Anchor.center,
-        scale: Vector2.all(0.3),
-        priority: 1000,
-      )),
+        'Objects description',
+        position: Vector2(2268, 2340),
+        size: Vector2(668, 536) / 3.3,
+      ),
     );
 
     camera.follow(ember);
-  }
-
-  @override
-  void onMouseMove(PointerHoverInfo info) {
-    if (info.raw.kind != PointerDeviceKind.mouse) return;
-    final screenPosition =
-        (info.eventPosition.widget - camera.viewport.size / 2) /
-            camera.viewfinder.zoom +
-        camera.viewfinder.position;
-    final block = map.getBlock(screenPosition);
-    selector.show = map.containsBlock(block) && map.blockValue(block) != -1;
-    selector.position.setFrom(map.position + map.getBlockRenderPosition(block));
-  }
-
-  @override
-  void onTapDown(TapDownInfo info) {
-    final screenPosition =
-        (info.eventPosition.widget - camera.viewport.size / 2) /
-            camera.viewfinder.zoom +
-        camera.viewfinder.position;
-    final block = map.getBlock(screenPosition);
-    if (!map.containsBlock(block) || buildContext == null) return;
-
-    selector.show = false;
-    final provider = Provider.of<AppState>(buildContext!, listen: false);
-
-    provider.description = switch (_rand.nextInt(2)) {
-      0 => 'Just empty tile. Really...',
-      1 => 'Another empty tile. Really...',
-      _ => '???',
-    };
-    overlays.add('Description', priority: 1);
   }
 
   @override
