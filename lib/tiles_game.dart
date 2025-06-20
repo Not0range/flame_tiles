@@ -58,15 +58,17 @@ class TilesGame extends FlameGame
 
     world.add(ember = Ember<TilesGame>(mapPosition: _path[0]));
 
-    final dec = await images.load('a.png');
-    world.add(
-      DecorationObject(
-        dec,
-        'Objects description',
-        position: Vector2(2268, 2340),
-        size: Vector2(668, 536) / 3.3,
-      ),
-    );
+    final decorations = mapJson['decorations'] as List<dynamic>;
+    for (var d in decorations) {
+      world.add(
+        DecorationObject(
+          await images.load(d['url']), //TODO replace to network image
+          d['description'],
+          position: Vector2(d['x'], d['y']),
+          size: Vector2(d['width'], d['height']),
+        ),
+      );
+    }
 
     camera.follow(ember);
   }

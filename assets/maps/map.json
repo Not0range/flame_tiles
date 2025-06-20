@@ -754,5 +754,15 @@
             "y": 0,
             "type": 0
         }
+    ],
+    "decorations": [
+        {
+            "x": 2268,
+            "y": 2320,
+            "width": 222,
+            "height": 178,
+            "url": "a.png",
+            "description": "Object description"
+        }
     ]
 }
