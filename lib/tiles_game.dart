@@ -8,6 +8,7 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame/input.dart';
 import 'package:flame/sprite.dart';
+import 'package:flame_network_assets/flame_network_assets.dart';
 import 'package:flutter/material.dart' show Colors;
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -29,6 +30,7 @@ class TilesGame extends FlameGame
 
   @override
   FutureOr<void> onLoad() async {
+    final networkAssets = FlameNetworkImages();
     final mapJson = jsonDecode(
       await rootBundle.loadString('assets/maps/map.json'),
     );
@@ -44,15 +46,18 @@ class TilesGame extends FlameGame
       matrix[tile['y']][tile['x']] = 0;
     }
 
-    final tilesImg = await images.load('tiles.png');
-    final sprites = SpriteSheet(image: tilesImg, srcSize: Vector2.all(32));
+    final tilesImg = await networkAssets.load(mapJson['tileSet']['url']);
+    final sprites = SpriteSheet(
+      image: tilesImg,
+      srcSize: Vector2.all(mapJson['tileSet']['srcSize']),
+    );
 
     world.add(
       map = MapComponent(
         sprites,
         matrix,
-        destTileSize: Vector2.all(64),
-        tileHeight: 16,
+        destTileSize: Vector2.all(mapJson['tileSet']['destSize']),
+        tileHeight: mapJson['tileSet']['height'],
       ),
     );
 

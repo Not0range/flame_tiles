@@ -1,4 +1,10 @@
 {
+    "tileSet": {
+        "url": "https://raw.githubusercontent.com/flame-engine/flame/refs/heads/main/examples/assets/images/tile_maps/tiles-short.png",
+        "srcSize": 32,
+        "destSize": 64,
+        "height": 16
+    },
     "sizes": {
         "width": 75,
         "height": 76
