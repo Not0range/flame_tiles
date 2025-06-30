@@ -1,3 +1,5 @@
+import 'package:flame/components.dart';
+import 'package:flame/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -60,10 +62,24 @@ Widget inventoryOverlay(BuildContext context, TilesGame game) {
 }
 
 Widget _inventoryCell(BuildContext context, TilesGame game, int? child) {
-  final icon = switch (child) {
-    0 => Icons.ac_unit,
-    1 => Icons.access_alarm,
-    2 => Icons.dangerous,
+  final i = switch (child) {
+    0 => SpriteAnimationWidget.asset(
+      path: 'ember.png',
+      data: SpriteAnimationData.sequenced(
+        amount: 4,
+        textureSize: Vector2.all(16),
+        stepTime: 0.15,
+      ),
+    ),
+    1 => SpriteAnimationWidget.asset(
+      path: 'ember.png',
+      data: SpriteAnimationData.sequenced(
+        amount: 4,
+        textureSize: Vector2.all(16),
+        stepTime: 0.3,
+      ),
+    ),
+    2 => SpriteWidget.asset(path: 'ember.png', srcSize: Vector2.all(16)),
     _ => null,
   };
 
@@ -84,11 +100,12 @@ Widget _inventoryCell(BuildContext context, TilesGame game, int? child) {
                 : null,
             borderRadius: BorderRadius.circular(16),
             child: Container(
+              padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.black12,
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: (icon != null ? Icon(icon, size: 40) : null),
+              child: i,
             ),
           ),
         ),
