@@ -160,7 +160,7 @@ class TilesGame extends FlameGame
   }
 
   void resetCamera() {
-    camera.follow(ember, maxSpeed: 1000);
+    camera.follow(ember, maxSpeed: 3000);
   }
 }
 
