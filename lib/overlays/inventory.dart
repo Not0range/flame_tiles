@@ -4,9 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../app_state.dart';
+import '../components/overlay_sprite.dart';
 import '../tiles_game.dart';
 
 const _overlayMargin = 16.0;
+const _emberUrl =
+    'https://raw.githubusercontent.com/flame-engine/flame/refs/heads/main/examples/assets/images/animations/ember.png';
 
 Widget inventoryOverlay(BuildContext context, TilesGame game) {
   final width = MediaQuery.of(context).size.width - _overlayMargin * 2;
@@ -63,21 +66,15 @@ Widget inventoryOverlay(BuildContext context, TilesGame game) {
 
 Widget _inventoryCell(BuildContext context, TilesGame game, int? child) {
   final i = switch (child) {
-    0 => SpriteAnimationWidget.asset(
-      path: 'ember.png',
-      data: SpriteAnimationData.sequenced(
-        amount: 4,
-        textureSize: Vector2.all(16),
-        stepTime: 0.15,
-      ),
+    0 => OverlaySprite(
+      url: _emberUrl,
+      stepTime: 0.15,
+      textureSize: Vector2.all(16),
     ),
-    1 => SpriteAnimationWidget.asset(
-      path: 'ember.png',
-      data: SpriteAnimationData.sequenced(
-        amount: 4,
-        textureSize: Vector2.all(16),
-        stepTime: 0.3,
-      ),
+    1 => OverlaySprite(
+      url: _emberUrl,
+      stepTime: 0.3,
+      textureSize: Vector2.all(16),
     ),
     2 => SpriteWidget.asset(path: 'ember.png', srcSize: Vector2.all(16)),
     _ => null,
