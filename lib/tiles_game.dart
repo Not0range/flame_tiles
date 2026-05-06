@@ -14,12 +14,15 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'app_state.dart';
-import 'components/decoration_object.dart';
+// import 'components/decoration_object.dart';
 import 'components/map_component.dart';
 import 'utils/matrix_utils.dart';
+import 'package:http/http.dart' as http;
 
 class TilesGame extends FlameGame
     with ScrollDetector, ScaleDetector, MouseMovementDetector {
+  final networkAssets = FlameNetworkImages();
+
   late final IsometricTileMapComponent map;
   late final Ember ember;
 
@@ -30,10 +33,7 @@ class TilesGame extends FlameGame
 
   @override
   FutureOr<void> onLoad() async {
-    final networkAssets = FlameNetworkImages();
-    final mapJson = jsonDecode(
-      await rootBundle.loadString('assets/maps/map.json'),
-    );
+    final mapJson = jsonDecode(await _loadMap());
 
     final matrix = MatrixUtils.create2DMatrix(
       mapJson['sizes']['height'],
@@ -49,31 +49,31 @@ class TilesGame extends FlameGame
     final tilesImg = await networkAssets.load(mapJson['tileSet']['url']);
     final sprites = SpriteSheet(
       image: tilesImg,
-      srcSize: Vector2.all(mapJson['tileSet']['srcSize']),
+      srcSize: Vector2.all(mapJson['tileSet']['srcSize'].toDouble()),
     );
 
     world.add(
       map = MapComponent(
         sprites,
         matrix,
-        destTileSize: Vector2.all(mapJson['tileSet']['destSize']),
-        tileHeight: mapJson['tileSet']['height'],
+        destTileSize: Vector2.all(mapJson['tileSet']['destSize'].toDouble()),
+        tileHeight: mapJson['tileSet']['height'].toDouble(),
       ),
     );
 
     world.add(ember = Ember<TilesGame>(mapPosition: _path[0]));
 
-    final decorations = mapJson['decorations'] as List<dynamic>;
-    for (var d in decorations) {
-      world.add(
-        DecorationObject(
-          await images.load(d['url']), //TODO replace to network image
-          d['description'],
-          position: Vector2(d['x'], d['y']),
-          size: Vector2(d['width'], d['height']),
-        ),
-      );
-    }
+    // final decorations = mapJson['decorations'] as List<dynamic>;
+    // for (var d in decorations) {
+    //   world.add(
+    //     DecorationObject(
+    //       await images.load(d['url']), //TODO replace to network image
+    //       d['description'],
+    //       position: Vector2(d['x'], d['y']),
+    //       size: Vector2(d['width'], d['height']),
+    //     ),
+    //   );
+    // }
 
     camera.follow(ember);
   }
@@ -179,8 +179,12 @@ class Ember<T extends TilesGame> extends SpriteAnimationComponent
   @override
   Future<void> onLoad() async {
     position = map.position + map.getBlockCenterPosition(mapPosition);
-    animation = await game.loadSpriteAnimation(
-      'ember.png',
+
+    final ember = await game.networkAssets.load(
+      "https://raw.githubusercontent.com/Not0range/flame_tiles/refs/heads/master/assets/images/ember.png",
+    );
+    animation = SpriteAnimation.fromFrameData(
+      ember,
       SpriteAnimationData.sequenced(
         amount: 4,
         textureSize: Vector2.all(16),
@@ -298,4 +302,13 @@ class Ember<T extends TilesGame> extends SpriteAnimationComponent
     );
     mapPosition = block;
   }
+}
+
+Future<String> _loadMap() async {
+  final res = await http.get(
+    Uri.parse(
+      'https://raw.githubusercontent.com/Not0range/flame_tiles/refs/heads/master/assets/maps/map.json',
+    ),
+  );
+  return res.body;
 }

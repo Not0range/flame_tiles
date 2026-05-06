@@ -250,7 +250,7 @@ final _sides = [
     padding: _sidePadding,
     alignment: Alignment.center,
     decoration: _sideDecoration,
-    transform: Matrix4.identity()..translate(0, 0, -_diceSize / 2),
+    transform: Matrix4.identity()..translate(0.0, 0, -_diceSize / 2),
     transformAlignment: Alignment.center,
     child: Center(child: const _DiceDot()),
   ),
@@ -262,7 +262,7 @@ final _sides = [
     alignment: Alignment.center,
     decoration: _sideDecoration,
     transform: Matrix4.identity()
-      ..translate(0, _diceSize / 2)
+      ..translate(0.0, _diceSize / 2)
       ..rotateX(_halfPi),
     transformAlignment: Alignment.center,
     child: Column(
@@ -328,7 +328,7 @@ final _sides = [
     alignment: Alignment.center,
     decoration: _sideDecoration,
     transform: Matrix4.identity()
-      ..translate(0, -_diceSize / 2)
+      ..translate(0.0, -_diceSize / 2)
       ..rotateX(-_halfPi),
     transformAlignment: Alignment.center,
     child: Column(
@@ -355,7 +355,7 @@ final _sides = [
     alignment: Alignment.center,
     decoration: _sideDecoration,
     transform: Matrix4.identity()
-      ..translate(0, 0, _diceSize / 2)
+      ..translate(0.0, 0, _diceSize / 2)
       ..rotateY(-math.pi),
     transformAlignment: Alignment.center,
     child: Column(

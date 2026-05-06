@@ -76,7 +76,11 @@ Widget _inventoryCell(BuildContext context, TilesGame game, int? child) {
       stepTime: 0.3,
       textureSize: Vector2.all(16),
     ),
-    2 => SpriteWidget.asset(path: 'ember.png', srcSize: Vector2.all(16)),
+    2 => OverlaySprite(
+      url: _emberUrl,
+      stepTime: 1,
+      textureSize: Vector2.all(16),
+    ),
     _ => null,
   };
 

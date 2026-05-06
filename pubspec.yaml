@@ -1,6 +1,6 @@
 name: flame_tiles
 description: "A new Flutter project."
-publish_to: 'none'
+publish_to: "none"
 version: 0.1.0
 
 environment:
@@ -12,6 +12,7 @@ dependencies:
   flame: ^1.29.0
   provider: ^6.1.5
   flame_network_assets: ^0.3.3+12
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:
@@ -20,7 +21,3 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
-  assets:
-    - assets/images/
-    - assets/maps/
